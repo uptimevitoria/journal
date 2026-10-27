@@ -872,178 +872,249 @@
   </div>
 
   <script>
-    // Controle de Abas
-    function switchTab(tabIndex) {
-      document.getElementById('tabBtn1').classList.toggle('active', tabIndex === 1);
-      document.getElementById('tabBtn2').classList.toggle('active', tabIndex === 2);
-      document.getElementById('tabContent1').classList.toggle('active', tabIndex === 1);
-      document.getElementById('tabContent2').classList.toggle('active', tabIndex === 2);
-    }
+    // ==========================================================
+// MOTOR DE ÁUDIO SINTÉTICO (3 NÍVEIS DISTINTOS)
+// ==========================================================
+function playAudioConfirm() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Primeiro tom (D5 - 587Hz)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(587.33, ctx.currentTime);
+    gain1.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.18);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start();
+    osc1.stop(ctx.currentTime + 0.18);
 
-    // Feedback Sonoro Sintético
-    function playBeep(isSuccess) {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+    // Segundo tom mais agudo (A5 - 880Hz) com delay de 90ms
+    setTimeout(() => {
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(880, ctx.currentTime);
+      gain2.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start();
+      osc2.stop(ctx.currentTime + 0.35);
+    }, 90);
+  } catch (e) {
+    console.warn("AudioContext bloqueado:", e);
+  }
+}
 
+function playAudioVictory() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+      setTimeout(() => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.22, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.45);
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        if (isSuccess) {
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(520, audioCtx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(1040, audioCtx.currentTime + 0.3);
-          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-          osc.start();
-          osc.stop(audioCtx.currentTime + 0.3);
-        } else {
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-          osc.frequency.setValueAtTime(120, audioCtx.currentTime + 0.15);
-          gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-          osc.start();
-          osc.stop(audioCtx.currentTime + 0.25);
-        }
-      } catch (e) {
-        console.warn("AudioContext bloqueado:", e);
-      }
-    }
-
-    // Motor de Validação Parcial
-    const btnVerify = document.getElementById('btnVerifyDossier');
-    const feedback = document.getElementById('dossierFeedback');
-    const protocolModal = document.getElementById('protocolModal');
-
-    btnVerify.addEventListener('click', () => {
-      const slots = [1, 2, 3].map(id => ({
-        id,
-        card: document.getElementById(`slotCard${id}`),
-        badge: document.getElementById(`badgeStatus${id}`),
-        data: extractSlotData(id)
-      }));
-
-      let matchedTargets = {
-        ireena: false,
-        ellie: false,
-        vincent: false
-      };
-
-      let verifiedCount = 0;
-
-      slots.forEach(slot => {
-        const d = slot.data;
-        const has = (ev) => d.evidences.includes(ev);
-
-        // 1. IREENA LIMESTONE (Changeling / Guilty / Evil / Hollow Black Eyes / SEM EMF5 / SEM UV Writing / SEM Green Eyes)
-        if (
-          !matchedTargets.ireena &&
-          (d.name.includes("ireena") || d.name.includes("limestone")) &&
-          d.patient === "yes" &&
-          d.archetype === "changeling" &&
-          d.status === "guilty" &&
-          d.moral === "evil" &&
-          has("spirit_box") &&
-          has("freezing") &&
-          has("black_eyes") &&
-          has("ghost_orbs") &&
-          !has("emf5") &&
-          !has("uv_writing") &&
-          !has("green_eyes")
-        ) {
-          markSlotVerified(slot, "✓ IREENA VERIFIED");
-          matchedTargets.ireena = true;
-          verifiedCount++;
-          return;
-        }
-
-        // 2. ELLIE (Banshee / Patient: NO / Victim / Good / Parabolic / Freezing / UV Fingers / EMF 5 / Glowing Green Eyes / SEM Spirit Box / SEM Ghost Orbs)
-        if (
-          !matchedTargets.ellie &&
-          d.name.includes("ellie") &&
-          d.patient === "no" &&
-          d.archetype === "banshee" &&
-          d.status === "victim" &&
-          d.moral === "good" &&
-          has("parabolic") &&
-          has("freezing") &&
-          has("uv_fingers") &&
-          has("emf5") &&
-          has("green_eyes") &&
-          !has("spirit_box") &&
-          !has("ghost_orbs") &&
-          !has("black_eyes")
-        ) {
-          markSlotVerified(slot, "✓ ELLIE VERIFIED");
-          matchedTargets.ellie = true;
-          verifiedCount++;
-          return;
-        }
-
-        // 3. VINCENT HAZAN (Jinn / Patient: YES / Victim / Neutral / EMF 5 / UV Writing / Ghost Orbs / SEM Freezing)
-        if (
-          !matchedTargets.vincent &&
-          (d.name.includes("vincent") || d.name.includes("hazan")) &&
-          d.patient === "yes" &&
-          d.archetype === "jinn" &&
-          d.status === "victim" &&
-          d.moral === "neutral" &&
-          has("emf5") &&
-          has("uv_writing") &&
-          has("ghost_orbs") &&
-          !has("freezing")
-        ) {
-          markSlotVerified(slot, "✓ VINCENT VERIFIED");
-          matchedTargets.vincent = true;
-          verifiedCount++;
-          return;
-        }
-
-        markSlotFailed(slot);
-      });
-
-      if (verifiedCount === 3) {
-        feedback.style.color = "var(--green)";
-        feedback.textContent = "[SUCCESS] ALL 3 ANOMALIES CATALOGED. OVERRIDING...";
-        playBeep(true);
-
-        setTimeout(() => {
-          protocolModal.style.display = "flex";
-        }, 800);
-      } else {
-        playBeep(false);
-        feedback.style.color = "var(--amber)";
-        feedback.textContent = `[PARTIAL PROGRESS] ${verifiedCount} OF 3 TARGETS CONFIRMED. CHECK CRITERIA.`;
-      }
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.45);
+      }, idx * 110);
     });
+  } catch (e) {
+    console.warn("AudioContext bloqueado:", e);
+  }
+}
 
-    function markSlotVerified(slot, label) {
-      slot.card.classList.remove('failed');
-      slot.card.classList.add('verified');
-      slot.badge.textContent = label;
-      slot.card.querySelectorAll('input, select').forEach(el => el.disabled = true);
+function playAudioError() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(160, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(95, ctx.currentTime + 0.28);
+    gain.gain.setValueAtTime(0.28, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.28);
+  } catch (e) {
+    console.warn("AudioContext bloqueado:", e);
+  }
+}
+
+// ==========================================================
+// CONTROLE DE NAVEGAÇÃO ENTRE ABAS
+// ==========================================================
+function switchTab(tabIndex) {
+  document.getElementById('tabBtn1').classList.toggle('active', tabIndex === 1);
+  document.getElementById('tabBtn2').classList.toggle('active', tabIndex === 2);
+  document.getElementById('tabContent1').classList.toggle('active', tabIndex === 1);
+  document.getElementById('tabContent2').classList.toggle('active', tabIndex === 2);
+}
+
+// ==========================================================
+// MOTOR DE VALIDAÇÃO FORENSE (ORDER-INDEPENDENT)
+// ==========================================================
+const btnVerify = document.getElementById('btnVerifyDossier');
+const feedback = document.getElementById('dossierFeedback');
+const protocolModal = document.getElementById('protocolModal');
+
+let alreadyVerifiedCount = 0;
+
+btnVerify.addEventListener('click', () => {
+  const slots = [1, 2, 3].map(id => ({
+    id,
+    card: document.getElementById(`slotCard${id}`),
+    badge: document.getElementById(`badgeStatus${id}`),
+    data: extractSlotData(id)
+  }));
+
+  let matchedTargets = {
+    ireena: false,
+    ellie: false,
+    vincent: false
+  };
+
+  let newlyVerifiedInThisTurn = 0;
+  let totalVerifiedNow = 0;
+
+  slots.forEach(slot => {
+    // Se o slot já estava verificado anteriormente, contabiliza e pula
+    if (slot.card.classList.contains('verified')) {
+      totalVerifiedNow++;
+      return;
     }
 
-    function markSlotFailed(slot) {
-      if (slot.card.classList.contains('verified')) return;
-      slot.card.classList.add('failed');
-      slot.badge.textContent = "⚠ UNMATCHED";
+    const d = slot.data;
+    const has = (ev) => d.evidences.includes(ev);
+
+    // 1. IREENA LIMESTONE (Changeling / Guilty / Evil / Hollow Black Eyes / SEM EMF5 / SEM UV Writing / SEM Green Eyes)
+    if (
+      !matchedTargets.ireena &&
+      (d.name.includes("ireena") || d.name.includes("limestone")) &&
+      d.patient === "yes" &&
+      d.archetype === "changeling" &&
+      d.status === "guilty" &&
+      d.moral === "evil" &&
+      has("spirit_box") &&
+      has("freezing") &&
+      has("black_eyes") &&
+      has("ghost_orbs") &&
+      !has("emf5") &&
+      !has("uv_writing") &&
+      !has("green_eyes")
+    ) {
+      markSlotVerified(slot, "✓ IREENA VERIFIED");
+      matchedTargets.ireena = true;
+      newlyVerifiedInThisTurn++;
+      totalVerifiedNow++;
+      return;
     }
 
-    function extractSlotData(slotNum) {
-      const card = document.getElementById(`slotCard${slotNum}`);
-      const name = card.querySelector('.input-name').value.trim().toLowerCase();
-      const patientRadio = card.querySelector(`input[name="patient_${slotNum}"]:checked`);
-      const patient = patientRadio ? patientRadio.value : "";
-      const archetype = card.querySelector('.select-archetype').value;
-      const status = card.querySelector('.select-status').value;
-      const moral = card.querySelector('.select-moral').value;
-      const checkedEvidences = Array.from(card.querySelectorAll('.evidence-checklist input:checked')).map(cb => cb.value);
-
-      return { name, patient, archetype, status, moral, evidences: checkedEvidences };
+    // 2. ELLIE (Banshee / Patient: NO / Victim / Good / Parabolic / Freezing / UV Fingers / EMF 5 / Glowing Green Eyes / SEM Spirit Box / SEM Ghost Orbs)
+    if (
+      !matchedTargets.ellie &&
+      d.name.includes("ellie") &&
+      d.patient === "no" &&
+      d.archetype === "banshee" &&
+      d.status === "victim" &&
+      d.moral === "good" &&
+      has("parabolic") &&
+      has("freezing") &&
+      has("uv_fingers") &&
+      has("emf5") &&
+      has("green_eyes") &&
+      !has("spirit_box") &&
+      !has("ghost_orbs") &&
+      !has("black_eyes")
+    ) {
+      markSlotVerified(slot, "✓ ELLIE VERIFIED");
+      matchedTargets.ellie = true;
+      newlyVerifiedInThisTurn++;
+      totalVerifiedNow++;
+      return;
     }
+
+    // 3. VINCENT HAZAN (Jinn / Patient: YES / Victim / Neutral / EMF 5 / UV Writing / Ghost Orbs / SEM Freezing)
+    if (
+      !matchedTargets.vincent &&
+      (d.name.includes("vincent") || d.name.includes("hazan")) &&
+      d.patient === "yes" &&
+      d.archetype === "jinn" &&
+      d.status === "victim" &&
+      d.moral === "neutral" &&
+      has("emf5") &&
+      has("uv_writing") &&
+      has("ghost_orbs") &&
+      !has("freezing")
+    ) {
+      markSlotVerified(slot, "✓ VINCENT VERIFIED");
+      matchedTargets.vincent = true;
+      newlyVerifiedInThisTurn++;
+      totalVerifiedNow++;
+      return;
+    }
+
+    markSlotFailed(slot);
+  });
+
+  // FEEDBACK ACÚSTICO E VISUAL BASEADO NO PROGRESSO
+  if (totalVerifiedNow === 3) {
+    feedback.style.color = "var(--green)";
+    feedback.textContent = "[SUCCESS] ALL 3 ANOMALIES CATALOGED. OVERRIDING...";
+    playAudioVictory();
+
+    setTimeout(() => {
+      protocolModal.style.display = "flex";
+    }, 850);
+  } else if (newlyVerifiedInThisTurn > 0 || totalVerifiedNow > alreadyVerifiedCount) {
+    // Acertou pelo menos UM fantasma novo! Toca o som de CONFIRMAÇÃO (Ding-Ding)
+    feedback.style.color = "var(--cyan)";
+    feedback.textContent = `[CONFIRMED] NEW TARGET VERIFIED! (${totalVerifiedNow} OF 3 CATALOGED)`;
+    playAudioConfirm();
+  } else {
+    // Nenhum acerto novo ou dados inválidos
+    feedback.style.color = "var(--red)";
+    feedback.textContent = `[MISMATCH] CHECK CLINICAL RECORDS. (${totalVerifiedNow} OF 3 CONFIRMED)`;
+    playAudioError();
+  }
+
+  alreadyVerifiedCount = totalVerifiedNow;
+});
+
+function markSlotVerified(slot, label) {
+  slot.card.classList.remove('failed');
+  slot.card.classList.add('verified');
+  slot.badge.textContent = label;
+  slot.card.querySelectorAll('input, select').forEach(el => el.disabled = true);
+}
+
+function markSlotFailed(slot) {
+  if (slot.card.classList.contains('verified')) return;
+  slot.card.classList.add('failed');
+  slot.badge.textContent = "⚠ UNMATCHED";
+}
+
+function extractSlotData(slotNum) {
+  const card = document.getElementById(`slotCard${slotNum}`);
+  const name = card.querySelector('.input-name').value.trim().toLowerCase();
+  const patientRadio = card.querySelector(`input[name="patient_${slotNum}"]:checked`);
+  const patient = patientRadio ? patientRadio.value : "";
+  const archetype = card.querySelector('.select-archetype').value;
+  const status = card.querySelector('.select-status').value;
+  const moral = card.querySelector('.select-moral').value;
+  const checkedEvidences = Array.from(card.querySelectorAll('.evidence-checklist input:checked')).map(cb => cb.value);
+
+  return { name, patient, archetype, status, moral, evidences: checkedEvidences };
+}
   </script>
 </body>
 </html>
