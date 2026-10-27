@@ -3,20 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Innseye Asylum // Forensic Field Journal</title>
+  <title>Innseye Asylum // Forensic Field Terminal</title>
   <style>
     :root {
-      --bg: #060807;
-      --panel: #0d120f;
-      --panel-border: #1a261f;
+      --bg: #070908;
+      --panel-bg: #0e1310;
+      --panel-border: #1d2b22;
       --green: #22c55e;
-      --green-glow: rgba(34, 197, 94, 0.35);
-      --green-dim: rgba(34, 197, 94, 0.12);
+      --green-glow: rgba(34, 197, 94, 0.25);
+      --green-bright: #4ade80;
       --cyan: #38bdf8;
       --amber: #f59e0b;
       --red: #f43f5e;
-      --text: #cbd5e1;
-      --text-dim: #64748b;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --input-bg: #040605;
+      --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --font-mono: 'Courier New', Courier, monospace;
     }
 
@@ -24,140 +26,122 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      user-select: none;
     }
 
     body {
       background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-mono);
+      color: var(--text-main);
+      font-family: var(--font-ui);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 20px 16px 40px;
       overflow-x: hidden;
-    }
-
-    /* Scanlines sutis de monitor CRT */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
-      background-size: 100% 4px;
-      pointer-events: none;
-      z-index: 999;
+      user-select: none;
     }
 
     /* Cabeçalho do Terminal */
     header {
-      width: 100%;
-      max-width: 1000px;
+      background: #0a0f0c;
       border-bottom: 1px solid var(--panel-border);
-      padding-bottom: 14px;
-      margin-bottom: 18px;
+      padding: 12px 24px;
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      flex-wrap: wrap;
-      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
     }
 
-    .title-area h1 {
-      font-size: clamp(1rem, 2.2vw, 1.35rem);
-      color: var(--green);
+    .title-group h1 {
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
       letter-spacing: 2px;
-      text-shadow: 0 0 10px var(--green-glow);
-    }
-
-    .title-area span {
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      letter-spacing: 1px;
-    }
-
-    .status-badge {
-      font-size: 0.72rem;
-      padding: 4px 10px;
-      border: 1px solid var(--panel-border);
-      border-radius: 4px;
-      color: var(--amber);
-      background: rgba(245, 158, 11, 0.08);
-      letter-spacing: 1px;
-    }
-
-    /* Barra de Navegação entre Abas */
-    .nav-tabs {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      max-width: 1000px;
-      margin-bottom: 22px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 12px;
-      background: var(--panel);
-      border: 1px solid var(--panel-border);
-      color: var(--text-dim);
-      font-family: inherit;
-      font-size: 0.85rem;
-      font-weight: bold;
-      letter-spacing: 1.5px;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: all 0.2s ease;
-      border-radius: 6px;
-    }
-
-    .tab-btn:hover {
-      border-color: var(--green);
-      color: var(--text);
-    }
-
-    .tab-btn.active {
-      background: #0f1c14;
-      border-color: var(--green);
       color: var(--green);
-      box-shadow: 0 0 15px var(--green-dim);
     }
 
-    /* Conteúdo das Abas */
-    .tab-content {
-      width: 100%;
-      max-width: 1000px;
-      display: none;
+    .title-group p {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
     }
 
-    .tab-content.active {
-      display: block;
+    .header-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--amber);
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 1px;
     }
 
-    /* ========================================================
-       ABA 1: CATÁLOGO DE ARQUÉTIPOS (ENCYCLOPEDIA)
-       ======================================================== */
-    .catalog-grid {
+    /* Layout Dividido Lado a Lado (Split View) */
+    .workspace {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      grid-template-columns: 1fr 1fr;
       gap: 16px;
+      padding: 16px 20px;
+      flex: 1;
+      height: calc(100vh - 75px);
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
     }
 
-    .ghost-card {
-      background: var(--panel);
+    /* Painéis com rolagem independente */
+    .column-panel {
+      background: var(--panel-bg);
       border: 1px solid var(--panel-border);
       border-radius: 8px;
-      padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      transition: border-color 0.2s, transform 0.2s;
+      overflow: hidden;
     }
 
-    .ghost-card:hover {
-      border-color: var(--green);
-      transform: translateY(-2px);
+    .panel-header {
+      background: #111814;
+      border-bottom: 1px solid var(--panel-border);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .panel-header h2 {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: var(--cyan);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .scroll-area::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .scroll-area::-webkit-scrollbar-thumb {
+      background: var(--panel-border);
+      border-radius: 3px;
+    }
+
+    /* --- LADO ESQUERDO: CATÁLOGO DE ARQUÉTIPOS (FIELD JOURNAL) --- */
+    .ghost-card {
+      background: #090e0b;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .ghost-header {
@@ -165,235 +149,228 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px dashed var(--panel-border);
-      padding-bottom: 8px;
+      padding-bottom: 6px;
     }
 
     .ghost-header h3 {
-      font-size: 1.1rem;
+      font-family: var(--font-mono);
+      font-size: 1rem;
       color: var(--green);
       letter-spacing: 1px;
     }
 
-    .danger-tag {
-      font-size: 0.65rem;
-      padding: 2px 8px;
-      border-radius: 3px;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-
-    .danger-high { background: #450a0a; color: #f87171; border: 1px solid #7f1d1d; }
-    .danger-mid { background: #451a03; color: #fbbf24; border: 1px solid #78350f; }
-    .danger-low { background: #064e3b; color: #34d399; border: 1px solid #065f46; }
-
-    .evidence-tags {
+    .ghost-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin: 4px 0;
     }
 
-    .tag {
+    .tag-evidence {
+      font-family: var(--font-mono);
       font-size: 0.68rem;
-      background: rgba(56, 189, 248, 0.08);
+      background: rgba(56, 189, 248, 0.1);
       color: var(--cyan);
       border: 1px solid rgba(56, 189, 248, 0.25);
-      padding: 3px 7px;
+      padding: 2px 7px;
       border-radius: 4px;
     }
 
     .ghost-desc {
       font-size: 0.78rem;
-      line-height: 1.45;
       color: #94a3b8;
+      line-height: 1.4;
     }
 
     .ghost-note {
       font-size: 0.72rem;
-      color: var(--amber);
-      background: rgba(245, 158, 11, 0.06);
-      border-left: 2px solid var(--amber);
-      padding: 6px 8px;
+      color: #cbd5e1;
+      background: rgba(245, 158, 11, 0.08);
+      border-left: 3px solid var(--amber);
+      padding: 6px 10px;
       border-radius: 0 4px 4px 0;
+      line-height: 1.35;
     }
 
-    /* ========================================================
-       ABA 2: FORMULÁRIO PERICIAL (FORENSIC VERDICT)
-       ======================================================== */
-    .dossier-intro {
-      background: var(--panel);
+    /* --- LADO DIREITO: PRANCHETA FORENSE (CLIPBOARD) --- */
+    .slot-card {
+      background: #090e0b;
       border: 1px solid var(--panel-border);
-      border-radius: 8px;
-      padding: 16px 20px;
-      margin-bottom: 18px;
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.25s ease;
+    }
+
+    .slot-card.verified {
+      border-color: var(--green);
+      background: #06130b;
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.15);
+    }
+
+    .slot-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .dossier-intro p {
-      font-size: 0.8rem;
-      color: #94a3b8;
-      max-width: 650px;
-      line-height: 1.4;
-    }
-
-    .slots-container {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      margin-bottom: 24px;
-    }
-
-    .target-slot {
-      background: var(--panel);
-      border: 1px solid var(--panel-border);
-      border-radius: 8px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      position: relative;
-    }
-
-    .slot-title {
-      font-size: 0.95rem;
-      color: var(--cyan);
-      letter-spacing: 1.5px;
       border-bottom: 1px solid var(--panel-border);
       padding-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
     }
 
-    .form-grid {
+    .slot-header h4 {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      letter-spacing: 1px;
+    }
+
+    .badge-status {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 3px;
+      border: 1px solid #334155;
+      color: var(--text-muted);
+    }
+
+    .slot-card.verified .badge-status {
+      border-color: var(--green);
+      color: var(--green-bright);
+      background: rgba(34, 197, 94, 0.15);
+      font-weight: bold;
+    }
+
+    .slot-card.failed .badge-status {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(244, 63, 94, 0.1);
+    }
+
+    .slot-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 14px;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 10px;
     }
 
-    .field-group {
+    .field-box {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
     }
 
-    .field-group label {
-      font-size: 0.72rem;
-      color: #94a3b8;
-      letter-spacing: 0.8px;
+    .field-box label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      letter-spacing: 0.5px;
       text-transform: uppercase;
     }
 
-    .field-group input[type="text"],
-    .field-group select {
-      background: #060908;
+    .field-box input[type="text"],
+    .field-box select {
+      background: var(--input-bg);
       border: 1px solid var(--panel-border);
       color: #fff;
-      font-family: inherit;
-      font-size: 0.85rem;
-      padding: 9px 12px;
+      font-family: var(--font-ui);
+      font-size: 0.8rem;
+      padding: 7px 10px;
       border-radius: 4px;
       outline: none;
-      transition: border-color 0.2s;
     }
 
-    .field-group input[type="text"]:focus,
-    .field-group select:focus {
+    .field-box input[type="text"]:focus,
+    .field-box select:focus {
       border-color: var(--cyan);
     }
 
-    .radio-row {
+    .radio-group {
       display: flex;
-      gap: 16px;
+      gap: 12px;
       align-items: center;
-      margin-top: 4px;
+      height: 32px;
     }
 
-    .radio-row label {
-      font-size: 0.8rem;
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-
-    .checklist-title {
-      font-size: 0.72rem;
-      color: #94a3b8;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-
-    .checklist-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 8px;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 12px;
-      border-radius: 6px;
-      border: 1px solid var(--panel-border);
-    }
-
-    .checklist-grid label {
+    .radio-group label {
       font-size: 0.75rem;
       color: #cbd5e1;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 5px;
       cursor: pointer;
     }
 
-    .submit-bar {
+    /* Checklist de Evidências */
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--panel-border);
+    }
+
+    .evidence-grid label {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .evidence-grid input:checked + span {
+      color: var(--green-bright);
+      font-weight: 600;
+    }
+
+    /* Barra Inferior da Prancheta */
+    .clipboard-footer {
+      background: #111814;
+      border-top: 1px solid var(--panel-border);
+      padding: 12px 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
+      flex-shrink: 0;
     }
 
-    .btn-submit {
+    .btn-verify-all {
       width: 100%;
-      max-width: 440px;
-      padding: 14px;
+      padding: 11px;
       background: #064e3b;
       border: 1px solid var(--green);
-      color: #f0fdf4;
-      font-family: inherit;
-      font-size: 0.95rem;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
       font-weight: bold;
       letter-spacing: 2px;
       cursor: pointer;
-      border-radius: 6px;
+      border-radius: 5px;
       text-transform: uppercase;
-      box-shadow: 0 0 20px var(--green-dim);
-      transition: all 0.2s ease;
+      transition: all 0.2s;
     }
 
-    .btn-submit:hover {
+    .btn-verify-all:hover {
       background: #047857;
-      box-shadow: 0 0 30px var(--green-glow);
+      box-shadow: 0 0 15px var(--green-glow);
     }
 
-    .btn-submit:active { transform: scale(0.98); }
-
-    .verdict-feedback {
-      font-size: 0.82rem;
-      min-height: 1.4em;
-      text-align: center;
+    .dossier-feedback {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      min-height: 1.2em;
       letter-spacing: 1px;
     }
 
-    /* --- TELA MODAL DE SUCESSO (PROTOCOLO VERIFICADO) --- */
+    /* --- MODAL DE VITÓRIA (DESCONTAMINAÇÃO) --- */
     #protocolModal {
       position: fixed;
       inset: 0;
-      background: rgba(2, 6, 4, 0.95);
-      backdrop-filter: blur(8px);
-      z-index: 1000;
+      background: rgba(2, 6, 4, 0.96);
+      backdrop-filter: blur(6px);
+      z-index: 2000;
       display: none;
       flex-direction: column;
       align-items: center;
@@ -402,13 +379,13 @@
       text-align: center;
     }
 
-    .protocol-card {
-      background: #09140e;
+    .protocol-box {
+      background: #08120b;
       border: 2px solid var(--green);
-      box-shadow: 0 0 50px var(--green-glow);
-      border-radius: 12px;
-      padding: 35px 30px;
-      max-width: 580px;
+      box-shadow: 0 0 40px var(--green-glow);
+      border-radius: 10px;
+      padding: 30px;
+      max-width: 540px;
       width: 90%;
       display: flex;
       flex-direction: column;
@@ -416,481 +393,454 @@
       gap: 16px;
     }
 
-    .protocol-card h2 {
+    .protocol-box h2 {
+      font-family: var(--font-mono);
       font-size: 1.25rem;
       color: var(--green);
       letter-spacing: 2px;
     }
 
-    .protocol-card p {
+    .protocol-box p {
       font-size: 0.85rem;
       color: #cbd5e1;
       line-height: 1.5;
     }
 
-    .vocal-command-box {
-      background: #020804;
+    .vocal-order {
+      background: #020604;
       border: 1px dashed var(--green);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 16px 20px;
       width: 100%;
-      margin: 8px 0;
     }
 
-    .command-tag {
+    .vocal-order span {
       font-size: 0.68rem;
       color: var(--amber);
+      font-family: var(--font-mono);
       letter-spacing: 1px;
-      margin-bottom: 4px;
       display: block;
+      margin-bottom: 4px;
     }
 
-    .command-phrase {
-      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    .vocal-phrase {
+      font-family: var(--font-mono);
+      font-size: clamp(1.2rem, 2.5vw, 1.5rem);
       color: #fff;
       font-weight: bold;
       letter-spacing: 2px;
-      text-shadow: 0 0 12px var(--green-glow);
-    }
-
-    .btn-return {
-      margin-top: 10px;
-      background: transparent;
-      border: 1px solid var(--panel-border);
-      color: var(--text-dim);
-      padding: 8px 16px;
-      border-radius: 4px;
-      font-family: inherit;
-      font-size: 0.75rem;
-      cursor: pointer;
-    }
-
-    .btn-return:hover {
-      color: var(--text);
-      border-color: var(--text);
+      text-shadow: 0 0 10px var(--green-glow);
     }
   </style>
 </head>
 <body>
 
-  <!-- Cabeçalho Institucional -->
+  <!-- Topo Institucional -->
   <header>
-    <div class="title-area">
-      <h1>INNSEYE ASYLUM // PARANORMAL INCIDENT LOG</h1>
-      <span>FORENSIC ARCHIVE & PERICIAL CLASSIFICATION MATRIX</span>
+    <div class="title-group">
+      <h1>INNSEYE ASYLUM // FORENSIC TERMINAL</h1>
+      <p>INCIDENT #1926: CROSS-REFERENCE FIELD OBSERVATIONS WITH CLINICAL ARCHIVES</p>
     </div>
-    <div class="status-badge">SEC-CLEARANCE: LEVEL 4</div>
+    <div class="header-badge">STATION: LONDON HUB</div>
   </header>
 
-  <!-- Navegação por Abas -->
-  <div class="nav-tabs">
-    <button class="tab-btn active" id="tabBtn1" onclick="switchTab(1)">[ 📖 ENTITY ARCHETYPES ]</button>
-    <button class="tab-btn" id="tabBtn2" onclick="switchTab(2)">[ 📋 FORENSIC VERDICT ]</button>
+  <!-- Espaço de Trabalho Dividido -->
+  <div class="workspace">
+
+    <!-- ========================================================
+         COLUNA ESQUERDA: FIELD JOURNAL (CATÁLOGO RANDOMIZADO)
+         ======================================================== -->
+    <div class="column-panel">
+      <div class="panel-header">
+        <h2>📖 Field Journal (Entity Database)</h2>
+        <span style="font-size: 0.72rem; color: var(--text-muted);">8 CLASSIFICATIONS</span>
+      </div>
+
+      <div class="scroll-area">
+
+        <!-- 1. SIREN (Despistador) -->
+        <div class="ghost-card">
+          <div class="ghost-header">
+            <h3>SIREN</h3>
+            <span class="tag-evidence">AGGRESSIVE</span>
+          </div>
+          <div class="ghost-tags">
+            <span class="tag-evidence">Parabolic Wailing</span>
+            <span class="tag-evidence">Freezing Temps</span>
+            <span class="tag-evidence">UV Writing</span>
+            <span class="tag-evidence">Spirit Box</span>
+          </div>
+          <p class="ghost-desc">Auditory deceiver commonly mistaken for a Banshee due to mournful wailing. However, the Siren actively taunts investigators on synthetic radio sweeps (Spirit Box) and leaves invisible messages on surfaces.</p>
+          <div class="ghost-note">DIFFERENTIAL: Banshees never respond to Spirit Box queries; Sirens communicate actively.</div>
+        </div>
+
+        <!-- 2. OBAKE (Despistador) -->
+        <div class="ghost-card">
+          <div class="ghost-header">
+            <h3>OBAKE</h3>
+            <span class="tag-evidence">MUTATING</span>
+          </div>
+          <div class="ghost-tags">
+            <span class="tag-evidence">EMF Level 5</span>
+            <span class="tag-evidence">UV Fingers</span>
+            <span class="tag-evidence">Ghost Orbs</span>
+          </div>
+          <p class="ghost-desc">Displaced shape-shifter originating from overseas maritime quarantine tests. Rapidly alters limb structure and finger prints under ultraviolet radiation.</p>
+          <div class="ghost-note">LINGUISTIC ANOMALY: Vocal transmissions are exclusively broadcast in archaic Japanese dialects. Rule out Obake if English is detected.</div>
+        </div>
+
+        <!-- 3. JINN (ALVO: VINCENT HAZAN) -->
+        <div class="ghost-card">
+          <div class="ghost-header">
+            <h3>JINN</h3>
+            <span class="tag-evidence" style="border-color: var(--amber); color: var(--amber);">NEUTRAL / CONDUCTOR</span>
+          </div>
+          <div class="ghost-tags">
+            <span class="tag-evidence">EMF Level 5</span>
+            <span class="tag-evidence">UV Writing</span>
+            <span class="tag-evidence">Ghost Orbs</span>
+            <span class="tag-evidence">Room Temperature</span>
+          </div>
+          <p class="ghost-desc">Conductor anomaly fused directly with electrical conduits, copper lines and high-frequency communication nodes. Travels through live wire currents.</p>
+          <div class="ghost-note">THERMAL & VOLTAGE FOOTPRINT: Maintains normal room temperature (DOES NOT freeze). Manifests high EMF spikes near network routers and causes telemetry glitches during power surges.</div>
+        </div>
+
+        <!-- 4. REVENANT (Despistador) -->
+        <div class="ghost-card">
+          <div class="ghost-header">
+            <h3>REVENANT</h3>
+            <span class="tag-evidence">RELENTLESS</span>
+          </div>
+          <div class="ghost-tags">
+            <span class="tag-evidence">Ghost Orbs</span>
+            <span class="tag-evidence">UV Writing</span>
+            <span class="tag-evidence">Freezing Temps</span>
+          </div>
+          <p class="ghost-desc">Violent kinetic specter possessing extreme territorial instincts. Moves slowly when unobserved, accelerating violently upon visual contact with humans.</p>
+          <div class="ghost-note">DIFFERENTIAL: Complete absence of high-voltage electromagnetic emission (0.0 EMF) across all frequencies.</div>
+        </div>
+
+        <!-- 5. THE MIMIC (Despistador) -->
+        <div class="ghost-card">
+          <div class="ghost-header">
+            <h3>THE MIMIC</h3>
+            <span class="tag-evidence">DECEIVER</span>
+          </div>
+          <div class="ghost-tags">
+            <span class="tag-evidence">Freezing Temps</span>
+            <span class="tag-evidence">Spirit Box</span>
+            <span class="tag-evidence">UV Fingers</span>
+            <span class="tag-evidence">Fake Ghost Orbs</span>
+          </div>
+          <p class="ghost-desc">Complex deceiver that replicates properties of nearby entities. Emits ghost orbs as a secondary biological byproduct rather than an electromagnetic signature.</p>
+          <div class="ghost-note">DIFFERENTIAL: Fails to generate EMF 5 spikes despite manifesting freezing temperatures and radio speech.</div>
+        </div>
+
+        <!-- 6. CHANGELING (ALVO: IREENA LIMESTONE) -->
+        <div class="ghost-card">
+          <div class="ghost-header">
+            <h3>CHANGELING</h3>
+            <span class="tag-evidence" style="border-color: var(--red); color: var(--red);">PREDATOR / EVIL</span>
+          </div>
+          <div class="ghost-tags">
+            <span class="tag-evidence">Spirit Box</span>
+            <span class="tag-evidence">Freezing Temps</span>
+            <span class="tag-evidence">Hollow Black Eyes</span>
+            <span class="tag-evidence">Ghost Orbs</span>
+          </div>
+          <p class="ghost-desc">Invasive parasitic entity that assimilates human hosts through physical mimicry. Generates intense sub-zero temperature drops and vocal hostility on radio sweeps. Emits zero high-voltage electromagnetic radiation (NO EMF 5).</p>
+          <div class="ghost-note">OCULAR EVOLUTION: Presents glowing emerald green irises during the incubation phase; upon complete bio-mutant transformation, the eyes collapse into hollow, pitch-black voids.</div>
+        </div>
+
+        <!-- 7. MOROI (Despistador) -->
+        <div class="ghost-card">
+          <div class="ghost-header">
+            <h3>MOROI</h3>
+            <span class="tag-evidence">AGGRESSIVE</span>
+          </div>
+          <div class="ghost-tags">
+            <span class="tag-evidence">Spirit Box</span>
+            <span class="tag-evidence">Freezing Temps</span>
+            <span class="tag-evidence">UV Writing</span>
+          </div>
+          <p class="ghost-desc">Hyper-verbal apparition that drains bodily heat to manifest. Constantly writes obsessive messages with invisible fluid on floorboards and walls.</p>
+          <div class="ghost-note">DIFFERENTIAL: Shares freezing temperature and radio responses with the Changeling, but leaves physical UV writing rather than ocular anomalies.</div>
+        </div>
+
+        <!-- 8. BANSHEE (ALVO: ELLIE) -->
+        <div class="ghost-card">
+          <div class="ghost-header">
+            <h3>BANSHEE</h3>
+            <span class="tag-evidence" style="border-color: var(--green); color: var(--green-bright);">RESIDUAL / VICTIM</span>
+          </div>
+          <div class="ghost-tags">
+            <span class="tag-evidence">Parabolic Wailing</span>
+            <span class="tag-evidence">Freezing Temps</span>
+            <span class="tag-evidence">UV Fingers</span>
+            <span class="tag-evidence">EMF Level 5</span>
+          </div>
+          <p class="ghost-desc">Bound to personal trauma or tragic family loss. Never responds to synthetic radio sweeps or Spirit Box questions. Emits directional acoustic distress signals.</p>
+          <div class="ghost-note">CLINICAL NOTE: Leaves distinct bio-mutant digital prints (UV Fingers) across furniture near cold spots.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================
+         COLUNA DIREITA: CLIPBOARD (PRANCHETA FORENSE)
+         ======================================================== -->
+    <div class="column-panel">
+      <div class="panel-header">
+        <h2>📋 Forensic Clipboard (Verdict Slots)</h2>
+        <span style="font-size: 0.72rem; color: var(--amber);">3 TARGETS REQUIRED</span>
+      </div>
+
+      <div class="scroll-area">
+
+        <!-- SLOT 1 -->
+        <div class="slot-card" id="slotCard1" data-slot="1">
+          <div class="slot-header">
+            <h4>FORENSIC TARGET #01</h4>
+            <span class="badge-status" id="badgeStatus1">PENDING</span>
+          </div>
+
+          <div class="slot-grid">
+            <div class="field-box">
+              <label>Identified Name / Codename:</label>
+              <input type="text" class="input-name" placeholder="Subject name..." autocomplete="off">
+            </div>
+            <div class="field-box">
+              <label>Asylum Patient? (Wall Archive):</label>
+              <div class="radio-group">
+                <label><input type="radio" name="patient_1" value="yes"> YES</label>
+                <label><input type="radio" name="patient_1" value="no"> NO</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="slot-grid">
+            <div class="field-box">
+              <label>Archetype Classification:</label>
+              <select class="select-archetype">
+                <option value="">-- Select Archetype --</option>
+                <option value="banshee">Banshee</option>
+                <option value="changeling">Changeling</option>
+                <option value="jinn">Jinn</option>
+                <option value="siren">Siren</option>
+                <option value="moroi">Moroi</option>
+                <option value="the_mimic">The Mimic</option>
+                <option value="obake">Obake</option>
+                <option value="revenant">Revenant</option>
+              </select>
+            </div>
+            <div class="field-box">
+              <label>Legal Status & Moral Alignment:</label>
+              <div style="display: flex; gap: 6px;">
+                <select class="select-status" style="flex: 1;">
+                  <option value="">Status</option>
+                  <option value="guilty">Guilty</option>
+                  <option value="victim">Victim</option>
+                </select>
+                <select class="select-moral" style="flex: 1;">
+                  <option value="">Moral</option>
+                  <option value="good">Good</option>
+                  <option value="neutral">Neutral</option>
+                  <option value="evil">Evil</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-box">
+            <label>Observed Evidence Profile:</label>
+            <div class="evidence-grid">
+              <label><input type="checkbox" value="emf5"> <span>EMF Level 5</span></label>
+              <label><input type="checkbox" value="freezing"> <span>Freezing Temp</span></label>
+              <label><input type="checkbox" value="spirit_box"> <span>Spirit Box</span></label>
+              <label><input type="checkbox" value="parabolic"> <span>Parabolic Wailing</span></label>
+              <label><input type="checkbox" value="uv_fingers"> <span>UV Fingers</span></label>
+              <label><input type="checkbox" value="uv_writing"> <span>UV Writing</span></label>
+              <label><input type="checkbox" value="ghost_orbs"> <span>Ghost Orbs</span></label>
+              <label><input type="checkbox" value="black_eyes"> <span>Black Eyes</span></label>
+              <label><input type="checkbox" value="room_temp"> <span>Room Temp</span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLOT 2 -->
+        <div class="slot-card" id="slotCard2" data-slot="2">
+          <div class="slot-header">
+            <h4>FORENSIC TARGET #02</h4>
+            <span class="badge-status" id="badgeStatus2">PENDING</span>
+          </div>
+
+          <div class="slot-grid">
+            <div class="field-box">
+              <label>Identified Name / Codename:</label>
+              <input type="text" class="input-name" placeholder="Subject name..." autocomplete="off">
+            </div>
+            <div class="field-box">
+              <label>Asylum Patient? (Wall Archive):</label>
+              <div class="radio-group">
+                <label><input type="radio" name="patient_2" value="yes"> YES</label>
+                <label><input type="radio" name="patient_2" value="no"> NO</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="slot-grid">
+            <div class="field-box">
+              <label>Archetype Classification:</label>
+              <select class="select-archetype">
+                <option value="">-- Select Archetype --</option>
+                <option value="banshee">Banshee</option>
+                <option value="changeling">Changeling</option>
+                <option value="jinn">Jinn</option>
+                <option value="siren">Siren</option>
+                <option value="moroi">Moroi</option>
+                <option value="the_mimic">The Mimic</option>
+                <option value="obake">Obake</option>
+                <option value="revenant">Revenant</option>
+              </select>
+            </div>
+            <div class="field-box">
+              <label>Legal Status & Moral Alignment:</label>
+              <div style="display: flex; gap: 6px;">
+                <select class="select-status" style="flex: 1;">
+                  <option value="">Status</option>
+                  <option value="guilty">Guilty</option>
+                  <option value="victim">Victim</option>
+                </select>
+                <select class="select-moral" style="flex: 1;">
+                  <option value="">Moral</option>
+                  <option value="good">Good</option>
+                  <option value="neutral">Neutral</option>
+                  <option value="evil">Evil</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-box">
+            <label>Observed Evidence Profile:</label>
+            <div class="evidence-grid">
+              <label><input type="checkbox" value="emf5"> <span>EMF Level 5</span></label>
+              <label><input type="checkbox" value="freezing"> <span>Freezing Temp</span></label>
+              <label><input type="checkbox" value="spirit_box"> <span>Spirit Box</span></label>
+              <label><input type="checkbox" value="parabolic"> <span>Parabolic Wailing</span></label>
+              <label><input type="checkbox" value="uv_fingers"> <span>UV Fingers</span></label>
+              <label><input type="checkbox" value="uv_writing"> <span>UV Writing</span></label>
+              <label><input type="checkbox" value="ghost_orbs"> <span>Ghost Orbs</span></label>
+              <label><input type="checkbox" value="black_eyes"> <span>Black Eyes</span></label>
+              <label><input type="checkbox" value="room_temp"> <span>Room Temp</span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLOT 3 -->
+        <div class="slot-card" id="slotCard3" data-slot="3">
+          <div class="slot-header">
+            <h4>FORENSIC TARGET #03</h4>
+            <span class="badge-status" id="badgeStatus3">PENDING</span>
+          </div>
+
+          <div class="slot-grid">
+            <div class="field-box">
+              <label>Identified Name / Codename:</label>
+              <input type="text" class="input-name" placeholder="Subject name..." autocomplete="off">
+            </div>
+            <div class="field-box">
+              <label>Asylum Patient? (Wall Archive):</label>
+              <div class="radio-group">
+                <label><input type="radio" name="patient_3" value="yes"> YES</label>
+                <label><input type="radio" name="patient_3" value="no"> NO</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="slot-grid">
+            <div class="field-box">
+              <label>Archetype Classification:</label>
+              <select class="select-archetype">
+                <option value="">-- Select Archetype --</option>
+                <option value="banshee">Banshee</option>
+                <option value="changeling">Changeling</option>
+                <option value="jinn">Jinn</option>
+                <option value="siren">Siren</option>
+                <option value="moroi">Moroi</option>
+                <option value="the_mimic">The Mimic</option>
+                <option value="obake">Obake</option>
+                <option value="revenant">Revenant</option>
+              </select>
+            </div>
+            <div class="field-box">
+              <label>Legal Status & Moral Alignment:</label>
+              <div style="display: flex; gap: 6px;">
+                <select class="select-status" style="flex: 1;">
+                  <option value="">Status</option>
+                  <option value="guilty">Guilty</option>
+                  <option value="victim">Victim</option>
+                </select>
+                <select class="select-moral" style="flex: 1;">
+                  <option value="">Moral</option>
+                  <option value="good">Good</option>
+                  <option value="neutral">Neutral</option>
+                  <option value="evil">Evil</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-box">
+            <label>Observed Evidence Profile:</label>
+            <div class="evidence-grid">
+              <label><input type="checkbox" value="emf5"> <span>EMF Level 5</span></label>
+              <label><input type="checkbox" value="freezing"> <span>Freezing Temp</span></label>
+              <label><input type="checkbox" value="spirit_box"> <span>Spirit Box</span></label>
+              <label><input type="checkbox" value="parabolic"> <span>Parabolic Wailing</span></label>
+              <label><input type="checkbox" value="uv_fingers"> <span>UV Fingers</span></label>
+              <label><input type="checkbox" value="uv_writing"> <span>UV Writing</span></label>
+              <label><input type="checkbox" value="ghost_orbs"> <span>Ghost Orbs</span></label>
+              <label><input type="checkbox" value="black_eyes"> <span>Black Eyes</span></label>
+              <label><input type="checkbox" value="room_temp"> <span>Room Temp</span></label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Rodapé com Botão de Verificação -->
+      <div class="clipboard-footer">
+        <button class="btn-verify-all" id="btnVerifyDossier">🔍 Verify Dossier Entries</button>
+        <div class="dossier-feedback" id="dossierFeedback"></div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- ========================================================
-       ABA 1: CATÁLOGO DE ARQUÉTIPOS
-       ======================================================== -->
-  <div class="tab-content active" id="tabContent1">
-    <div class="catalog-grid">
-
-      <!-- Banshee -->
-      <div class="ghost-card">
-        <div class="ghost-header">
-          <h3>BANSHEE</h3>
-          <span class="danger-tag danger-low">RESIDUAL / VICTIM</span>
-        </div>
-        <div class="evidence-tags">
-          <span class="tag">Parabolic Wailing</span>
-          <span class="tag">Freezing Temps</span>
-          <span class="tag">UV Fingers</span>
-          <span class="tag">EMF Level 5</span>
-        </div>
-        <p class="ghost-desc">Bound to personal trauma or tragic family loss. Never responds to synthetic radio sweeps or Spirit Box questions. Emits directional vocal wailing and acoustic distress signals.</p>
-        <div class="ghost-note">CLINICAL NOTE: Leaves distinct bio-mutant digital prints (UV Fingers) across furniture near cold spots.</div>
-      </div>
-
-      <!-- Changeling -->
-      <div class="ghost-card">
-        <div class="ghost-header">
-          <h3>CHANGELING</h3>
-          <span class="danger-tag danger-high">PREDATOR / EVIL</span>
-        </div>
-        <div class="evidence-tags">
-          <span class="tag">Spirit Box</span>
-          <span class="tag">Freezing Temps</span>
-          <span class="tag">Hollow Black Eyes</span>
-          <span class="tag">Ghost Orbs</span>
-        </div>
-        <p class="ghost-desc">Invasive parasitic entity that assimilates human hosts through physical mimicry. Manifests intense sub-zero temperature drops and vocal static hostility on radio sweeps. Emits zero high-voltage electromagnetic radiation (no EMF 5).</p>
-        <div class="ghost-note">OCULAR EVOLUTION: Presents glowing emerald green irises during initial incubation; upon complete bio-mutant transformation, the eyes collapse into hollow, pitch-black voids.</div>
-      </div>
-
-      <!-- Jinn -->
-      <div class="ghost-card">
-        <div class="ghost-header">
-          <h3>JINN</h3>
-          <span class="danger-tag danger-mid">NEUTRAL / CONDUCTOR</span>
-        </div>
-        <div class="evidence-tags">
-          <span class="tag">EMF Level 5</span>
-          <span class="tag">UV Writing</span>
-          <span class="tag">Ghost Orbs</span>
-          <span class="tag">Room Temperature</span>
-        </div>
-        <p class="ghost-desc">Entity merged directly with copper conduits, electrical infrastructure and data nodes. Travels through live wire currents. Highly sensitive to power surges.</p>
-        <div class="ghost-note">CLINICAL NOTE: Does NOT induce freezing temperatures. Manifests near high-frequency routers and triggers electronic telemetry glitches during peak voltage.</div>
-      </div>
-
-      <!-- Siren -->
-      <div class="ghost-card">
-        <div class="ghost-header">
-          <h3>SIREN</h3>
-          <span class="danger-tag danger-high">AGGRESSIVE</span>
-        </div>
-        <div class="evidence-tags">
-          <span class="tag">Parabolic Wailing</span>
-          <span class="tag">Freezing Temps</span>
-          <span class="tag">UV Writing</span>
-          <span class="tag">Spirit Box</span>
-        </div>
-        <p class="ghost-desc">Auditory deceiver commonly mistaken for a Banshee due to mournful acoustic frequencies. However, the Siren actively answers vocal radio queries with mocking taunts and writes warnings on surfaces.</p>
-        <div class="ghost-note">DIFFERENTIAL: Banshees never reply on the Spirit Box; Sirens communicate actively.</div>
-      </div>
-
-      <!-- Moroi -->
-      <div class="ghost-card">
-        <div class="ghost-header">
-          <h3>MOROI</h3>
-          <span class="danger-tag danger-high">AGGRESSIVE</span>
-        </div>
-        <div class="evidence-tags">
-          <span class="tag">Spirit Box</span>
-          <span class="tag">Freezing Temps</span>
-          <span class="tag">UV Writing</span>
-        </div>
-        <p class="ghost-desc">Hyper-verbal apparition that drains bodily heat to manifest. Constantly writes obsessive messages with invisible fluid on floorboards and walls.</p>
-        <div class="ghost-note">DIFFERENTIAL: Shares freezing temperature and radio responses with the Changeling, but leaves physical UV writing rather than ocular anomalies.</div>
-      </div>
-
-      <!-- The Mimic -->
-      <div class="ghost-card">
-        <div class="ghost-header">
-          <h3>THE MIMIC</h3>
-          <span class="danger-tag danger-high">DECEIVER</span>
-        </div>
-        <div class="evidence-tags">
-          <span class="tag">Freezing Temps</span>
-          <span class="tag">Spirit Box</span>
-          <span class="tag">UV Fingers</span>
-          <span class="tag">Fake Orbs</span>
-        </div>
-        <p class="ghost-desc">A complex deceiver that replicates properties of other entities. Emits ghost orbs as a secondary biological byproduct rather than an electromagnetic signature.</p>
-        <div class="ghost-note">DIFFERENTIAL: Fails to generate EMF 5 spikes despite manifesting thermal drops and radio voices.</div>
-      </div>
-
-      <!-- Obake -->
-      <div class="ghost-card">
-        <div class="ghost-header">
-          <h3>OBAKE</h3>
-          <span class="danger-tag danger-mid">MUTATING</span>
-        </div>
-        <div class="evidence-tags">
-          <span class="tag">EMF Level 5</span>
-          <span class="tag">UV Fingers</span>
-          <span class="tag">Ghost Orbs</span>
-        </div>
-        <p class="ghost-desc">Ancient displaced shape-shifter resulting from transatlantic oceanic bio-samples. Rapidly alters limb structure and finger counts under ultraviolet radiation.</p>
-        <div class="ghost-note">LINGUISTIC ANOMALY: Vocal communications are exclusively transmitted in archaic Japanese dialects. If English is heard, rule out Obake immediately.</div>
-      </div>
-
-      <!-- Revenant -->
-      <div class="ghost-card">
-        <div class="ghost-header">
-          <h3>REVENANT</h3>
-          <span class="danger-tag danger-high">RELENTLESS</span>
-        </div>
-        <div class="evidence-tags">
-          <span class="tag">Ghost Orbs</span>
-          <span class="tag">UV Writing</span>
-          <span class="tag">Freezing Temps</span>
-        </div>
-        <p class="ghost-desc">Violent kinetic specter possessing violent territorial instincts. Moves at slow speeds when unobserved, accelerating violently upon visual contact.</p>
-        <div class="ghost-note">DIFFERENTIAL: Displays complete absence of electromagnetic emission (0.0 EMF) across all frequencies.</div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ========================================================
-       ABA 2: FORMULÁRIO DO DOSSIÊ FORENSE
-       ======================================================== -->
-  <div class="tab-content" id="tabContent2">
-    
-    <div class="dossier-intro">
-      <p>
-        Cross-reference evidence gathered from physical gear (Thermo ❄️, UV 🟣, EMF 📱), 
-        corridor telemetry, surveillance feeds, and Montreal crime scene findings.
-        Identify the three distinct entities responsible for the containment incident.
-      </p>
-      <div class="status-badge">TARGETS: 3 DETECTED</div>
-    </div>
-
-    <div class="slots-container" id="slotsContainer">
-
-      <!-- SLOT 1 -->
-      <div class="target-slot" data-slot="1">
-        <div class="slot-title">
-          <span>FORENSIC SUBJECT #01</span>
-          <span style="color: var(--text-dim); font-size: 0.75rem;">INPUT FIELD</span>
-        </div>
-
-        <div class="form-grid">
-          <div class="field-group">
-            <label>SUBJECT REAL NAME / CODENAME:</label>
-            <input type="text" class="input-name" placeholder="Enter identified name..." autocomplete="off">
-          </div>
-
-          <div class="field-group">
-            <label>IS AN ASYLUM PATIENT? (CHECK WALL ARCHIVE):</label>
-            <div class="radio-row">
-              <label><input type="radio" name="patient_1" value="yes"> YES</label>
-              <label><input type="radio" name="patient_1" value="no"> NO</label>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label>ENTITY ARCHETYPE:</label>
-            <select class="select-archetype">
-              <option value="">-- SELECT CLASSIFICATION --</option>
-              <option value="banshee">Banshee</option>
-              <option value="changeling">Changeling</option>
-              <option value="jinn">Jinn</option>
-              <option value="siren">Siren</option>
-              <option value="moroi">Moroi</option>
-              <option value="the_mimic">The Mimic</option>
-              <option value="obake">Obake</option>
-              <option value="revenant">Revenant</option>
-            </select>
-          </div>
-
-          <div class="field-group">
-            <label>LEGAL SITUATION & MORAL ORIENTATION:</label>
-            <div style="display: flex; gap: 10px;">
-              <select class="select-situation" style="flex: 1;">
-                <option value="">-- STATUS --</option>
-                <option value="guilty">Guilty (Aggressor)</option>
-                <option value="victim">Victim (Trapped/Killed)</option>
-              </select>
-              <select class="select-orientation" style="flex: 1;">
-                <option value="">-- MORAL --</option>
-                <option value="good">Good</option>
-                <option value="neutral">Neutral</option>
-                <option value="evil">Evil</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="checklist-title">DOCUMENTED EVIDENCE CHECKLIST:</div>
-        <div class="checklist-grid">
-          <label><input type="checkbox" value="emf5"> EMF Level 5</label>
-          <label><input type="checkbox" value="freezing"> Freezing Temperatures</label>
-          <label><input type="checkbox" value="spirit_box"> Spirit Box Response</label>
-          <label><input type="checkbox" value="parabolic"> Parabolic Wailing</label>
-          <label><input type="checkbox" value="uv_fingers"> UV Fingers</label>
-          <label><input type="checkbox" value="uv_writing"> UV Writing</label>
-          <label><input type="checkbox" value="ghost_orbs"> Ghost Orbs</label>
-          <label><input type="checkbox" value="black_eyes"> Hollow Black Eyes</label>
-          <label><input type="checkbox" value="room_temp"> Room Temp (Normal)</label>
-        </div>
-      </div>
-
-      <!-- SLOT 2 -->
-      <div class="target-slot" data-slot="2">
-        <div class="slot-title">
-          <span>FORENSIC SUBJECT #02</span>
-          <span style="color: var(--text-dim); font-size: 0.75rem;">INPUT FIELD</span>
-        </div>
-
-        <div class="form-grid">
-          <div class="field-group">
-            <label>SUBJECT REAL NAME / CODENAME:</label>
-            <input type="text" class="input-name" placeholder="Enter identified name..." autocomplete="off">
-          </div>
-
-          <div class="field-group">
-            <label>IS AN ASYLUM PATIENT? (CHECK WALL ARCHIVE):</label>
-            <div class="radio-row">
-              <label><input type="radio" name="patient_2" value="yes"> YES</label>
-              <label><input type="radio" name="patient_2" value="no"> NO</label>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label>ENTITY ARCHETYPE:</label>
-            <select class="select-archetype">
-              <option value="">-- SELECT CLASSIFICATION --</option>
-              <option value="banshee">Banshee</option>
-              <option value="changeling">Changeling</option>
-              <option value="jinn">Jinn</option>
-              <option value="siren">Siren</option>
-              <option value="moroi">Moroi</option>
-              <option value="the_mimic">The Mimic</option>
-              <option value="obake">Obake</option>
-              <option value="revenant">Revenant</option>
-            </select>
-          </div>
-
-          <div class="field-group">
-            <label>LEGAL SITUATION & MORAL ORIENTATION:</label>
-            <div style="display: flex; gap: 10px;">
-              <select class="select-situation" style="flex: 1;">
-                <option value="">-- STATUS --</option>
-                <option value="guilty">Guilty (Aggressor)</option>
-                <option value="victim">Victim (Trapped/Killed)</option>
-              </select>
-              <select class="select-orientation" style="flex: 1;">
-                <option value="">-- MORAL --</option>
-                <option value="good">Good</option>
-                <option value="neutral">Neutral</option>
-                <option value="evil">Evil</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="checklist-title">DOCUMENTED EVIDENCE CHECKLIST:</div>
-        <div class="checklist-grid">
-          <label><input type="checkbox" value="emf5"> EMF Level 5</label>
-          <label><input type="checkbox" value="freezing"> Freezing Temperatures</label>
-          <label><input type="checkbox" value="spirit_box"> Spirit Box Response</label>
-          <label><input type="checkbox" value="parabolic"> Parabolic Wailing</label>
-          <label><input type="checkbox" value="uv_fingers"> UV Fingers</label>
-          <label><input type="checkbox" value="uv_writing"> UV Writing</label>
-          <label><input type="checkbox" value="ghost_orbs"> Ghost Orbs</label>
-          <label><input type="checkbox" value="black_eyes"> Hollow Black Eyes</label>
-          <label><input type="checkbox" value="room_temp"> Room Temp (Normal)</label>
-        </div>
-      </div>
-
-      <!-- SLOT 3 -->
-      <div class="target-slot" data-slot="3">
-        <div class="slot-title">
-          <span>FORENSIC SUBJECT #03</span>
-          <span style="color: var(--text-dim); font-size: 0.75rem;">INPUT FIELD</span>
-        </div>
-
-        <div class="form-grid">
-          <div class="field-group">
-            <label>SUBJECT REAL NAME / CODENAME:</label>
-            <input type="text" class="input-name" placeholder="Enter identified name..." autocomplete="off">
-          </div>
-
-          <div class="field-group">
-            <label>IS AN ASYLUM PATIENT? (CHECK WALL ARCHIVE):</label>
-            <div class="radio-row">
-              <label><input type="radio" name="patient_3" value="yes"> YES</label>
-              <label><input type="radio" name="patient_3" value="no"> NO</label>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label>ENTITY ARCHETYPE:</label>
-            <select class="select-archetype">
-              <option value="">-- SELECT CLASSIFICATION --</option>
-              <option value="banshee">Banshee</option>
-              <option value="changeling">Changeling</option>
-              <option value="jinn">Jinn</option>
-              <option value="siren">Siren</option>
-              <option value="moroi">Moroi</option>
-              <option value="the_mimic">The Mimic</option>
-              <option value="obake">Obake</option>
-              <option value="revenant">Revenant</option>
-            </select>
-          </div>
-
-          <div class="field-group">
-            <label>LEGAL SITUATION & MORAL ORIENTATION:</label>
-            <div style="display: flex; gap: 10px;">
-              <select class="select-situation" style="flex: 1;">
-                <option value="">-- STATUS --</option>
-                <option value="guilty">Guilty (Aggressor)</option>
-                <option value="victim">Victim (Trapped/Killed)</option>
-              </select>
-              <select class="select-orientation" style="flex: 1;">
-                <option value="">-- MORAL --</option>
-                <option value="good">Good</option>
-                <option value="neutral">Neutral</option>
-                <option value="evil">Evil</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="checklist-title">DOCUMENTED EVIDENCE CHECKLIST:</div>
-        <div class="checklist-grid">
-          <label><input type="checkbox" value="emf5"> EMF Level 5</label>
-          <label><input type="checkbox" value="freezing"> Freezing Temperatures</label>
-          <label><input type="checkbox" value="spirit_box"> Spirit Box Response</label>
-          <label><input type="checkbox" value="parabolic"> Parabolic Wailing</label>
-          <label><input type="checkbox" value="uv_fingers"> UV Fingers</label>
-          <label><input type="checkbox" value="uv_writing"> UV Writing</label>
-          <label><input type="checkbox" value="ghost_orbs"> Ghost Orbs</label>
-          <label><input type="checkbox" value="black_eyes"> Hollow Black Eyes</label>
-          <label><input type="checkbox" value="room_temp"> Room Temp (Normal)</label>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Barra de Submissão -->
-    <div class="submit-bar">
-      <button class="btn-submit" id="btnSubmitDossier">SUBMIT FORENSIC DOSSIER</button>
-      <div class="verdict-feedback" id="verdictFeedback"></div>
-    </div>
-
-  </div>
-
-  <!-- Modal de Protocolo Verificado (Vitória Forense) -->
+  <!-- Modal de Protocolo Aprovado -->
   <div id="protocolModal">
-    <div class="protocol-card">
+    <div class="protocol-box">
       <h2>✓ FORENSIC DOSSIER VERIFIED</h2>
       <p>
-        All three anomalous signatures have been successfully cataloged and cross-referenced. 
-        Decontamination sequence authorized.
+        All three anomalous entities have been cataloged with clinical accuracy. 
+        Containment lock released.
       </p>
 
-      <div class="vocal-command-box">
-        <span class="command-tag">SPEAK VOCAL COMMAND TO SMART STATION:</span>
-        <div class="command-phrase">"Echo, daylight protocol!"</div>
+      <div class="vocal-order">
+        <span>SPEAK VOCAL COMMAND TO SMART STATION:</span>
+        <div class="vocal-phrase">"Echo, daylight protocol!"</div>
       </div>
 
-      <p style="font-size: 0.75rem; color: var(--amber);">
-        [AWAIT LIGHT PURIFICATION & WHISPERED OVERRIDE SEQUENCE]
+      <p style="font-size: 0.72rem; color: var(--amber);">
+        [AWAIT LIGHT PURIFICATION & WHISPERED OVERRIDE CODE]
       </p>
-
-      <button class="btn-return" onclick="closeProtocolModal()">CLOSE TERMINAL</button>
     </div>
   </div>
 
   <script>
     // ==========================================================
-    // CONTROLE DE NAVEGAÇÃO ENTRE ABAS
-    // ==========================================================
-    function switchTab(tabIndex) {
-      document.getElementById('tabBtn1').classList.toggle('active', tabIndex === 1);
-      document.getElementById('tabBtn2').classList.toggle('active', tabIndex === 2);
-      document.getElementById('tabContent1').classList.toggle('active', tabIndex === 1);
-      document.getElementById('tabContent2').classList.toggle('active', tabIndex === 2);
-    }
-
-    function closeProtocolModal() {
-      document.getElementById('protocolModal').style.display = 'none';
-    }
-
-    // ==========================================================
-    // REPRODUÇÃO DE BEEP SINTÉTICO (SEM ARQUIVOS EXTERNOS)
+    // REPRODUÇÃO DE SOM SINTÉTICO (FEEDBACK ACÚSTICO)
     // ==========================================================
     function playBeep(isSuccess) {
       try {
@@ -903,139 +853,167 @@
 
         if (isSuccess) {
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.35);
-          gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
-          osc.start();
-          osc.stop(audioCtx.currentTime + 0.35);
-        } else {
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-          osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.15);
-          gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(1040, audioCtx.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
           osc.start();
           osc.stop(audioCtx.currentTime + 0.3);
+        } else {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(120, audioCtx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.25);
         }
       } catch (e) {
-        console.warn("AudioContext blocked:", e);
+        console.warn("AudioContext bloqueado:", e);
       }
     }
 
     // ==========================================================
-    // MOTOR DE VALIDAÇÃO FORENSE (ORDER-INDEPENDENT)
+    // VALIDADOR PARCIAL INDEPENDENTE DE ORDEM
     // ==========================================================
-    const btnSubmit = document.getElementById('btnSubmitDossier');
-    const feedback = document.getElementById('verdictFeedback');
+    const btnVerify = document.getElementById('btnVerifyDossier');
+    const feedback = document.getElementById('dossierFeedback');
     const protocolModal = document.getElementById('protocolModal');
 
-    btnSubmit.addEventListener('click', () => {
-      const slots = [1, 2, 3].map(id => extractSlotData(id));
+    btnVerify.addEventListener('click', () => {
+      const slots = [1, 2, 3].map(id => ({
+        id,
+        card: document.getElementById(`slotCard${id}`),
+        badge: document.getElementById(`badgeStatus${id}`),
+        data: extractSlotData(id)
+      }));
 
-      // Verificação de preenchimento completo básico
-      for (let i = 0; i < slots.length; i++) {
-        if (!slots[i].name || !slots[i].patient || !slots[i].archetype || !slots[i].situation || !slots[i].orientation) {
-          feedback.style.color = "var(--red)";
-          feedback.textContent = `[INCOMPLETE DOSSIER] SUBJECT #${i + 1} HAS EMPTY FIELDS.`;
-          playBeep(false);
+      // Rastreamento dos alvos identificados
+      let matchedTargets = {
+        ireena: false,
+        ellie: false,
+        vincent: false
+      };
+
+      let verifiedCount = 0;
+
+      // Avaliação de cada slot
+      slots.forEach(slot => {
+        const d = slot.data;
+
+        // 1. Checagem Ireena Limestone (Changeling / Guilty / Evil / NÃO TEM EMF5 / NÃO TEM UV Writing)
+        if (
+          !matchedTargets.ireena &&
+          (d.name.includes("ireena") || d.name.includes("limestone")) &&
+          d.patient === "yes" &&
+          d.archetype === "changeling" &&
+          d.status === "guilty" &&
+          d.moral === "evil" &&
+          d.evidences.includes("spirit_box") &&
+          d.evidences.includes("freezing") &&
+          d.evidences.includes("black_eyes") &&
+          d.evidences.includes("ghost_orbs") &&
+          !d.evidences.includes("emf5") &&
+          !d.evidences.includes("uv_writing")
+        ) {
+          markSlotVerified(slot, "✓ IREENA VERIFIED");
+          matchedTargets.ireena = true;
+          verifiedCount++;
           return;
         }
-      }
 
-      // Validação independente de ordem
-      let matchedIreena = false;
-      let matchedEllie = false;
-      let matchedVincent = false;
-
-      slots.forEach(s => {
-        // Checagem Madrasta (Ireena Limestone / Changeling)
+        // 2. Checagem Ellie (Banshee / Patient: NO / Victim / Good / NÃO RESPONDE SPIRIT BOX)
         if (
-          (s.name.includes("ireena") || s.name.includes("limestone")) &&
-          s.patient === "yes" &&
-          s.archetype === "changeling" &&
-          s.situation === "guilty" &&
-          s.orientation === "evil" &&
-          s.evidences.includes("spirit_box") &&
-          s.evidences.includes("freezing") &&
-          s.evidences.includes("black_eyes") &&
-          s.evidences.includes("ghost_orbs") &&
-          !s.evidences.includes("emf5") &&
-          !s.evidences.includes("uv_writing")
+          !matchedTargets.ellie &&
+          d.name.includes("ellie") &&
+          d.patient === "no" &&
+          d.archetype === "banshee" &&
+          d.status === "victim" &&
+          d.moral === "good" &&
+          d.evidences.includes("parabolic") &&
+          d.evidences.includes("freezing") &&
+          d.evidences.includes("uv_fingers") &&
+          d.evidences.includes("emf5") &&
+          !d.evidences.includes("spirit_box")
         ) {
-          matchedIreena = true;
+          markSlotVerified(slot, "✓ ELLIE VERIFIED");
+          matchedTargets.ellie = true;
+          verifiedCount++;
+          return;
         }
 
-        // Checagem Menina (Ellie / Banshee)
+        // 3. Checagem Vincent Hazan (Jinn / Patient: YES / Victim / Neutral / NÃO CONGELA)
         if (
-          s.name.includes("ellie") &&
-          s.patient === "no" &&
-          s.archetype === "banshee" &&
-          s.situation === "victim" &&
-          s.orientation === "good" &&
-          s.evidences.includes("parabolic") &&
-          s.evidences.includes("freezing") &&
-          s.evidences.includes("uv_fingers") &&
-          s.evidences.includes("emf5") &&
-          !s.evidences.includes("spirit_box")
+          !matchedTargets.vincent &&
+          (d.name.includes("vincent") || d.name.includes("hazan")) &&
+          d.patient === "yes" &&
+          d.archetype === "jinn" &&
+          d.status === "victim" &&
+          d.moral === "neutral" &&
+          d.evidences.includes("emf5") &&
+          d.evidences.includes("uv_writing") &&
+          d.evidences.includes("ghost_orbs") &&
+          d.evidences.includes("room_temp") &&
+          !d.evidences.includes("freezing")
         ) {
-          matchedEllie = true;
+          markSlotVerified(slot, "✓ VINCENT VERIFIED");
+          matchedTargets.vincent = true;
+          verifiedCount++;
+          return;
         }
 
-        // Checagem Pai (Vincent Hazan / Jinn)
-        if (
-          (s.name.includes("vincent") || s.name.includes("hazan")) &&
-          s.patient === "yes" &&
-          s.archetype === "jinn" &&
-          s.situation === "victim" &&
-          s.orientation === "neutral" &&
-          s.evidences.includes("emf5") &&
-          s.evidences.includes("uv_writing") &&
-          s.evidences.includes("ghost_orbs") &&
-          s.evidences.includes("room_temp") &&
-          !s.evidences.includes("freezing")
-        ) {
-          matchedVincent = true;
-        }
+        // Se não bateu com nenhum dos alvos disponíveis
+        markSlotFailed(slot);
       });
 
-      if (matchedIreena && matchedEllie && matchedVincent) {
+      // Feedback Geral
+      if (verifiedCount === 3) {
         feedback.style.color = "var(--green)";
-        feedback.textContent = "[SUCCESS] FORENSIC VERDICT MATCHES ALL INCIDENT ANOMALIES.";
+        feedback.textContent = "[SUCCESS] ALL 3 ANOMALIES CATALOGED. OVERRIDING...";
         playBeep(true);
 
         setTimeout(() => {
           protocolModal.style.display = "flex";
-        }, 600);
+        }, 800);
       } else {
-        feedback.style.color = "var(--red)";
-        feedback.textContent = "[VERIFICATION FAILED] CLINICAL INCOMPATIBILITY DETECTED. CHECK DOSSIER LOGS.";
         playBeep(false);
+        feedback.style.color = "var(--amber)";
+        feedback.textContent = `[PARTIAL PROGRESS] ${verifiedCount} OF 3 TARGETS CONFIRMED. CHECK CLINICAL CRITERIA.`;
       }
     });
 
-    function extractSlotData(slotNum) {
-      const container = document.querySelector(`.target-slot[data-slot="${slotNum}"]`);
-      const name = container.querySelector('.input-name').value.trim().toLowerCase();
+    function markSlotVerified(slot, label) {
+      slot.card.classList.remove('failed');
+      slot.card.classList.add('verified');
+      slot.badge.textContent = label;
       
-      const patientRadio = container.querySelector(`input[name="patient_${slotNum}"]:checked`);
+      // Trava os inputs deste slot para proteger o acerto
+      slot.card.querySelectorAll('input, select').forEach(el => el.disabled = true);
+    }
+
+    function markSlotFailed(slot) {
+      // Se já estava verificado, não destrava a menos que o usuário tenha alterado
+      if (slot.card.classList.contains('verified')) return;
+
+      slot.card.classList.add('failed');
+      slot.badge.textContent = "⚠ UNMATCHED";
+    }
+
+    function extractSlotData(slotNum) {
+      const card = document.getElementById(`slotCard${slotNum}`);
+      const name = card.querySelector('.input-name').value.trim().toLowerCase();
+      
+      const patientRadio = card.querySelector(`input[name="patient_${slotNum}"]:checked`);
       const patient = patientRadio ? patientRadio.value : "";
 
-      const archetype = container.querySelector('.select-archetype').value;
-      const situation = container.querySelector('.select-situation').value;
-      const orientation = container.querySelector('.select-orientation').value;
+      const archetype = card.querySelector('.select-archetype').value;
+      const status = card.querySelector('.select-status').value;
+      const moral = card.querySelector('.select-moral').value;
 
-      const checkedEvidences = Array.from(container.querySelectorAll('.checklist-grid input:checked'))
+      const checkedEvidences = Array.from(card.querySelectorAll('.evidence-grid input:checked'))
                                     .map(cb => cb.value);
 
-      return {
-        name,
-        patient,
-        archetype,
-        situation,
-        orientation,
-        evidences: checkedEvidences
-      };
+      return { name, patient, archetype, status, moral, evidences: checkedEvidences };
     }
   </script>
 </body>
