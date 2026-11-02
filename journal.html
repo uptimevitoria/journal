@@ -41,9 +41,6 @@
       overflow-x: hidden;
     }
 
-    /* ========================================================
-       TELA DE BLOQUEIO (SENHA SVI DE MONTREAL: 227)
-       ======================================================== */
     #lockScreen {
       position: fixed;
       inset: 0;
@@ -139,7 +136,6 @@
       letter-spacing: 1px;
     }
 
-    /* Cabeçalho */
     header {
       width: 100%;
       max-width: 950px;
@@ -177,7 +173,6 @@
       letter-spacing: 1px;
     }
 
-    /* Navegação por Abas */
     .nav-tabs {
       display: flex;
       gap: 12px;
@@ -214,7 +209,6 @@
       box-shadow: 0 0 15px var(--green-glow);
     }
 
-    /* Conteúdo das Abas */
     .tab-pane {
       width: 100%;
       max-width: 950px;
@@ -225,9 +219,6 @@
       display: block;
     }
 
-    /* ========================================================
-       ABA 1: FIELD JOURNAL (CATÁLOGO RANDOMIZADO)
-       ======================================================== */
     .catalog-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
@@ -304,9 +295,6 @@
       line-height: 1.35;
     }
 
-    /* ========================================================
-       ABA 2: CLIPBOARD (PRANCHETA FORENSE)
-       ======================================================== */
     .dossier-intro {
       background: var(--panel);
       border: 1px solid var(--panel-border);
@@ -503,7 +491,6 @@
       letter-spacing: 1px;
     }
 
-    /* Modal de Sucesso */
     #protocolModal {
       position: fixed;
       inset: 0;
@@ -603,9 +590,7 @@
     <button class="tab-btn" id="tabBtn2" onclick="switchTab(2)">[ 📋 FORENSIC VERDICT (CLIPBOARD) ]</button>
   </div>
 
-  <!-- ========================================================
-       ABA 1: FIELD JOURNAL (CONSULTA FOLHEÁVEL)
-       ======================================================== -->
+  <!-- ABA 1: FIELD JOURNAL -->
   <div class="tab-pane active" id="tabContent1">
     <div class="catalog-grid">
 
@@ -640,7 +625,7 @@
         <div class="ghost-note">LINGUISTIC ANOMALY: Vocal transmissions are exclusively broadcast in archaic Japanese dialects. Rule out Obake if English is detected.</div>
       </div>
 
-      <!-- 3. CHANGELING (ALVO: IREENA) -->
+      <!-- 3. CHANGELING (ALVO: IREENA — SEM GHOST ORBS) -->
       <div class="ghost-card">
         <div class="ghost-header">
           <h3>CHANGELING</h3>
@@ -650,7 +635,6 @@
           <span class="tag-item">Spirit Box</span>
           <span class="tag-item">Freezing Temps</span>
           <span class="tag-item">Hollow Black Eyes</span>
-          <span class="tag-item">Ghost Orbs</span>
         </div>
         <p class="ghost-desc">Invasive parasitic entity that assimilates human hosts through physical mimicry. Generates intense sub-zero temperature drops and vocal hostility on radio sweeps. Emits zero high-voltage electromagnetic radiation (NO EMF 5).</p>
         <div class="ghost-note">OCULAR EVOLUTION: Presents glowing emerald green irises during the incubation phase; upon complete bio-mutant transformation, the eyes collapse into hollow, pitch-black voids.</div>
@@ -737,9 +721,7 @@
     </div>
   </div>
 
-  <!-- ========================================================
-       ABA 2: CLIPBOARD (PRANCHETA FORENSE)
-       ======================================================== -->
+  <!-- ABA 2: CLIPBOARD -->
   <div class="tab-pane" id="tabContent2">
 
     <div class="dossier-intro">
@@ -984,14 +966,9 @@
   </div>
 
   <script>
-    // ==========================================================
-    // MOTOR DE ÁUDIO SINTÉTICO (3 NÍVEIS DISTINTOS)
-    // ==========================================================
     function playAudioConfirm() {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Primeiro tom (D5 - 587Hz)
         const osc1 = ctx.createOscillator();
         const gain1 = ctx.createGain();
         osc1.type = 'sine';
@@ -1003,7 +980,6 @@
         osc1.start();
         osc1.stop(ctx.currentTime + 0.18);
 
-        // Segundo tom mais agudo (A5 - 880Hz) com delay de 90ms
         setTimeout(() => {
           const osc2 = ctx.createOscillator();
           const gain2 = ctx.createGain();
@@ -1016,9 +992,7 @@
           osc2.start();
           osc2.stop(ctx.currentTime + 0.35);
         }, 90);
-      } catch (e) {
-        console.warn("AudioContext bloqueado:", e);
-      }
+      } catch (e) {}
     }
 
     function playAudioVictory() {
@@ -1038,9 +1012,7 @@
             osc.stop(ctx.currentTime + 0.45);
           }, idx * 110);
         });
-      } catch (e) {
-        console.warn("AudioContext bloqueado:", e);
-      }
+      } catch (e) {}
     }
 
     function playAudioError() {
@@ -1057,14 +1029,9 @@
         gain.connect(ctx.destination);
         osc.start();
         osc.stop(ctx.currentTime + 0.28);
-      } catch (e) {
-        console.warn("AudioContext bloqueado:", e);
-      }
+      } catch (e) {}
     }
 
-    // ==========================================================
-    // BLOQUEIO DE SENHA SVI (40 + 50 + 137 = 227)
-    // ==========================================================
     const VALID_SVI_CODES = ["227", "227SVI", "227 SVI", "227ML", "227 ML"];
 
     const lockScreen = document.getElementById('lockScreen');
@@ -1095,9 +1062,6 @@
       if (e.key === 'Enter') unlockJournal();
     });
 
-    // ==========================================================
-    // CONTROLE DE NAVEGAÇÃO ENTRE ABAS
-    // ==========================================================
     function switchTab(tabIndex) {
       document.getElementById('tabBtn1').classList.toggle('active', tabIndex === 1);
       document.getElementById('tabBtn2').classList.toggle('active', tabIndex === 2);
@@ -1105,9 +1069,6 @@
       document.getElementById('tabContent2').classList.toggle('active', tabIndex === 2);
     }
 
-    // ==========================================================
-    // MOTOR DE VALIDAÇÃO FORENSE (ORDER-INDEPENDENT)
-    // ==========================================================
     const btnVerify = document.getElementById('btnVerifyDossier');
     const feedback = document.getElementById('dossierFeedback');
     const protocolModal = document.getElementById('protocolModal');
@@ -1140,7 +1101,7 @@
         const d = slot.data;
         const has = (ev) => d.evidences.includes(ev);
 
-        // 1. IREENA LIMESTONE (Changeling / Guilty / Evil / Hollow Black Eyes / SEM EMF5 / SEM UV Writing / SEM Green Eyes)
+        // 1. IREENA LIMESTONE (Changeling / Guilty / Evil / Spirit Box / Freezing / Hollow Black Eyes — SEM exigir Ghost Orbs)
         if (
           !matchedTargets.ireena &&
           (d.name.includes("ireena") || d.name.includes("limestone")) &&
@@ -1151,7 +1112,6 @@
           has("spirit_box") &&
           has("freezing") &&
           has("black_eyes") &&
-          has("ghost_orbs") &&
           !has("emf5") &&
           !has("uv_writing") &&
           !has("green_eyes")
@@ -1163,7 +1123,7 @@
           return;
         }
 
-        // 2. ELLIE (Banshee / Patient: NO / Victim / Good / Parabolic / Freezing / UV Fingers / EMF 5 / Glowing Green Eyes / SEM Spirit Box / SEM Ghost Orbs)
+        // 2. ELLIE (Banshee / Patient: NO / Victim / Good / Parabolic / Freezing / UV Fingers / EMF 5 / Glowing Green Eyes)
         if (
           !matchedTargets.ellie &&
           d.name.includes("ellie") &&
@@ -1210,7 +1170,6 @@
         markSlotFailed(slot);
       });
 
-      // FEEDBACK ACÚSTICO E VISUAL BASEADO NO PROGRESSO
       if (totalVerifiedNow === 3) {
         feedback.style.color = "var(--green)";
         feedback.textContent = "[SUCCESS] ALL 3 ANOMALIES CATALOGED. OVERRIDING...";
